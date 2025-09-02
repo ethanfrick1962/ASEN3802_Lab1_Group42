@@ -46,4 +46,4 @@ plot(x, v_centered_solved);
 
 %% Plot: Part 1 Task 4 - 2 Symmetric Loads
 
-% Note that 
+% Note that
