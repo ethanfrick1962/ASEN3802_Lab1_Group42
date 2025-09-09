@@ -32,4 +32,72 @@ grid on;
 
 %% Show max deflection
 [maxDefl, idx] = min(v); % note: deflection is downward, so min value
+
 fprintf('Max deflection = %.4f mm at x = %.1f mm\n', maxDefl, x(idx));
+
+
+
+%% Support reactions (symmetry)
+RA = P/2; % [N]
+RB = P/2; % [N]
+
+%% Discretization
+npts = 500;
+x = linspace(0, L, npts);
+
+
+%% Shear force diagram V(x)
+V = zeros(size(x));
+for k = 1:numel(x)
+    if x(k) < L/2
+        V(k) = RA;
+    elseif x(k) > L/2
+        V(k) = -RB;
+    else
+        V(k) = NaN; % break line at midspan jump
+    end
+end
+
+%% Bending moment diagram M(x)
+M = zeros(size(x));
+for k = 1:numel(x)
+    if x(k) <= L/2
+        M(k) = RA * x(k);
+    else
+        M(k) = RA * x(k) - P * (x(k) - L/2);
+    end
+end
+
+%% Axial force diagram N(x) (zero for vertical load)
+N = zeros(size(x));
+
+%% --- PLOTS ---
+% 1. Reaction forces
+figure;
+bar([0 L],[RA RB],0.2);
+title('Support Reactions');
+xlabel('Location [mm]'); ylabel('Reaction force [N]');
+set(gca,'XTick',[0 L],'XTickLabel',{'A1 (x=0)','A2 (x=L)'});
+grid on;
+
+% 2. Shear force
+figure;
+plot(x,V,'LineWidth',2);
+title('Shear Force Diagram V(x)');
+xlabel('x [mm]'); ylabel('Shear force [N]');
+grid on;
+
+% 3. Bending moment
+figure;
+plot(x,M, 'LineWidth', 2);
+title('Bending Moment Diagram M(x)');
+xlabel('x [mm');
+ylabel('Moment [N*mm');
+grid on;
+
+% 5. Axial force
+figure;
+plot(x,N,'LineWidth',2);
+title('Axial Force Diagram N(x)');
+xlabel('x [mm]'); ylabel('Axial force [N]');
+grid on;
