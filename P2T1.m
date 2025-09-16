@@ -27,8 +27,11 @@ for dep_num = 1:numel(deps)
     for case_num = 1:numel(cases)
         x = cases(case_num).tbl.(loads);
         y = cases(case_num).tbl.(curr_dep);
-        cases(case_num).fit.(deps{dep_num}) = polyfit(x, y, 1);
+        [cases(case_num).fit.(deps{dep_num}), S] = polyfit(x, y, 1);
         cases(case_num).fit_coef.(deps{dep_num}) = polyval(cases(case_num).fit.(deps{dep_num}), x);
+
+        % Residual
+        R_squared(case_num, dep_num) = S.rsquared;
     end
 
     % Set up individual plots for each dependent variable, not case
@@ -42,12 +45,14 @@ for dep_num = 1:numel(deps)
         y = cases(case_num).tbl.([deps{dep_num}]);
         plot(x, y, 'o', 'DisplayName', sprintf('Case %d, raw', case_num));
         plot(x, cases(case_num).fit_coef.(deps{dep_num}), 'DisplayName', sprintf('Case %d, fit', case_num));
+
+        % Residuals
     end
 
     % Make it pretty
     title(sprintf('All cases of %s w/ linear fits', deps{dep_num}), 'Interpreter', 'none');
     xlabel('Loading case (lb)');
-    ylabel(sprintf('%s (lbf)', deps{dep_num}), 'Interpreter', 'none');
+    ylabel(sprintf('%s', deps{dep_num}), 'Interpreter', 'none');
     legend('Location','best');
 
     % Save figure into figures folder (hidden on git)
